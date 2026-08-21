@@ -26,3 +26,12 @@ export interface AthleteCardData {
   stats: AthleteStats;
   total: number;
 }
+
+/** Fiche détaillée d'un athlète, utilisée par la page Mes Analyses. */
+export interface AthleteProfile extends AthleteCardData {
+  country: string;
+  age: number;
+  competitionsCount: number;
+  bestTotal: number;
+  form: number; // évolution sur 30 jours, en %
+}

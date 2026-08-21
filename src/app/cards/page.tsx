@@ -3,8 +3,9 @@
 import { useMemo, useState } from 'react';
 import AthleteCard from '@/components/cards/AthleteCard';
 import PackShopCard from '@/components/cards/PackShopCard';
-import { packOffers, myCollection } from '@/data/mockData';
-import type { Gender } from '@/types';
+import PackOpeningModal from '@/components/cards/PackOpeningModal';
+import { packOffers, myCollection, featuredAthletes } from '@/data/mockData';
+import type { AthleteCardData, CardTier, Gender, PackOdds } from '@/types';
 import { cn } from '@/lib/utils';
 
 type GenderFilter = Gender | 'ALL';
@@ -15,16 +16,43 @@ const FILTERS: { key: GenderFilter; label: string }[] = [
   { key: 'F', label: 'Femmes' },
 ];
 
+// Pool de tirage pour l'ouverture de pack — combine les cartes déjà connues
+// de la démo. Sera remplacé par le tirage réel côté API une fois les
+// athlètes intégrés en base de données (POST /api/cards/packs/open).
+const DRAW_POOL: AthleteCardData[] = [...featuredAthletes, ...myCollection];
+
+function pickRandomTier(odds: PackOdds[]): CardTier {
+  const roll = Math.random();
+  let cumulative = 0;
+  for (const o of odds) {
+    cumulative += o.percent / 100;
+    if (roll <= cumulative) return o.tier;
+  }
+  return odds[odds.length - 1].tier;
+}
+
+function drawCards(cardCount: number, odds: PackOdds[]): AthleteCardData[] {
+  const drawn: AthleteCardData[] = [];
+  for (let i = 0; i < cardCount; i++) {
+    const tier = pickRandomTier(odds);
+    const candidates = DRAW_POOL.filter((a) => a.tier === tier);
+    const pool = candidates.length > 0 ? candidates : DRAW_POOL;
+    drawn.push(pool[Math.floor(Math.random() * pool.length)]);
+  }
+  return drawn;
+}
+
 /**
  * Page "Mes Cartes" : boutique de packs + collection filtrable.
- * Démontre deux mécaniques d'état distinctes :
- *   - `purchasingId` : état de chargement asynchrone pendant un achat
- *   - `genderFilter`  : filtre synchrone appliqué à la collection affichée
- * Toutes les données proviennent de src/data/mockData.ts.
+ * `handleBuy` tire les cartes selon les probabilités du pack (odds par
+ * palier), puis affiche <PackOpeningModal /> pour l'animation de révélation
+ * — même logique de tirage pondéré que le service `CardsService.openPack()`
+ * côté backend NestJS (livré précédemment), simulée ici côté client.
  */
 export default function CardsPage() {
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
   const [genderFilter, setGenderFilter] = useState<GenderFilter>('ALL');
+  const [revealedCards, setRevealedCards] = useState<AthleteCardData[] | null>(null);
 
   const filteredCollection = useMemo(
     () => myCollection.filter((athlete) => genderFilter === 'ALL' || athlete.gender === genderFilter),
@@ -32,15 +60,19 @@ export default function CardsPage() {
   );
 
   async function handleBuy(packId: string) {
+    const pack = packOffers.find((p) => p.id === packId);
+    if (!pack) return;
     setPurchasingId(packId);
     try {
       // Intégration réelle :
-      // await fetch('/api/cards/packs/open', {
+      // const res = await fetch('/api/cards/packs/open', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       //   body: JSON.stringify({ packTypeId: packId }),
       // });
-      await new Promise((r) => setTimeout(r, 700)); // simulation démo
+      // const { cards } = await res.json();
+      await new Promise((r) => setTimeout(r, 700)); // simulation démo du temps réseau
+      setRevealedCards(drawCards(pack.cardCount, pack.odds));
     } finally {
       setPurchasingId(null);
     }
@@ -90,6 +122,8 @@ export default function CardsPage() {
           </div>
         )}
       </section>
+
+      {revealedCards && <PackOpeningModal cards={revealedCards} onClose={() => setRevealedCards(null)} />}
     </div>
   );
 }

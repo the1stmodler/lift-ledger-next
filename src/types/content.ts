@@ -18,3 +18,13 @@ export interface SponsorItem {
   id: string;
   name: string;
 }
+
+/** Bandeau promo ponctuel (ex: bonus de jetons offerts) — accueil. */
+export interface PromoBanner {
+  eyebrow: string;
+  title: string;
+  description: string;
+  amountLabel: string;
+  amountSuffix: string;
+  ctaLabel: string;
+}

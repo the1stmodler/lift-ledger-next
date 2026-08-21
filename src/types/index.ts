@@ -11,3 +11,7 @@ export * from './shop';
 export * from './arena';
 export * from './navigation';
 export * from './content';
+export * from './onboarding';
+export * from './pregame';
+export * from './quiz';
+export * from './results';

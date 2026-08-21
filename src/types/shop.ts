@@ -24,3 +24,12 @@ export interface PackOffer {
   /** Met la carte en avant visuellement (pack "Élite" du prototype) */
   featured?: boolean;
 }
+
+/** Fiche explicative d'un palier de rareté (RarityTiersPanel, page d'accueil). */
+export interface RarityTierInfo {
+  tier: CardTier;
+  label: string;
+  description: string;
+  /** ex: "~55% des tirages" — indicatif, non contractuel */
+  dropRateLabel: string;
+}

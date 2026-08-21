@@ -26,3 +26,49 @@ export interface LeaderboardRow {
   weightLabel: string;
   currentTotal: number;
 }
+
+/** Onglet de compétition affiché en haut de la page Live Game (façon Esports World Cup). */
+export interface CompetitionTab {
+  id: string;
+  name: string;
+  status: 'live' | 'locked';
+  statusLabel: string;
+}
+
+/** Étape de la timeline des catégories (une par poids/genre). */
+export interface TimelineCategory {
+  id: string;
+  weightLabel: string;
+  genderLabel: string;
+  dayLabel: string;
+  timeLabel: string;
+  isLive: boolean;
+}
+
+// ============================================================
+// Mini-jeux spéciaux du Live Game : "The Final Attempt" (stratégie du
+// 3e essai) et "Perfect Score" (sans-faute). Le déroulé complet est
+// piloté par une file d'événements côté page (voir app/live/page.tsx).
+// ============================================================
+
+export type LiveEventType = 'lift' | 'final' | 'boss';
+
+export type FinalAttemptChoice = 'safe' | 'standard' | 'allin';
+
+export interface LiveEvent {
+  type: LiveEventType;
+  /** Pour 'lift' : essai standard, utilise directement LiveAttempt. */
+  attempt?: LiveAttempt;
+  /** Pour 'final' : contexte de l'essai 2 qui vient d'être validé. */
+  finalContext?: { athleteName: string; weightLabel: string; prevWeight: number; prevSuccess: boolean };
+  /** Pour 'boss' : athlète en sans-faute avant le Squat. */
+  bossContext?: { athleteName: string; weightLabel: string };
+}
+
+/** Ligne du podium flash affiché à la fin d'une catégorie. */
+export interface FlashPodiumEntry {
+  rank: number;
+  name: string;
+  points: number;
+  isMe?: boolean;
+}
