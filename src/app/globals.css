@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Polices — mêmes familles que le prototype (Anton / Inter / JetBrains Mono)
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ============================================================
+   Base — thème unique sombre, ne suit jamais le préférence système
+   ============================================================ */
+:root {
+  color-scheme: only dark;
+}
+
+html,
+body {
+  background: #05070a;
+  height: 100%;
+}
+
+body {
+  @apply font-sans text-platinum antialiased;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   Utilitaires impossibles à exprimer proprement en Tailwind pur
+   ============================================================ */
+
+/* Cadre métallique à coins facettés des cartes athlètes (AthleteCard).
+   `border-image` avec dégradé n'a pas d'équivalent Tailwind natif — les
+   couleurs --tier-a / --tier-b sont injectées en style inline par le
+   composant selon le palier de rareté (bronze / argent / or). */
+.card-metal-frame {
+  clip-path: polygon(
+    16px 0,
+    calc(100% - 16px) 0,
+    100% 16px,
+    100% calc(100% - 16px),
+    calc(100% - 16px) 100%,
+    16px 100%,
+    0 calc(100% - 16px),
+    0 16px
+  );
+  border: 2px solid transparent;
+  border-image: linear-gradient(
+      135deg,
+      var(--tier-a),
+      var(--tier-b) 45%,
+      var(--tier-a) 55%,
+      var(--tier-b)
+    )
+    1;
+}
+
+/* Fond holographique animé (maillage façon scan numérique) derrière le
+   portrait de la carte — dégradés répétés non exprimables en config Tailwind. */
+.card-holo-bg {
+  background-image: linear-gradient(
+      60deg,
+      transparent 47%,
+      rgba(120, 190, 255, 0.14) 49.5%,
+      rgba(120, 190, 255, 0.14) 50.5%,
+      transparent 53%
+    ),
+    linear-gradient(
+      -60deg,
+      transparent 47%,
+      rgba(120, 190, 255, 0.14) 49.5%,
+      rgba(120, 190, 255, 0.14) 50.5%,
+      transparent 53%
+    );
+  background-size: 30px 30px;
+}
+
+/* Grain fin façon carte premium, superposé en mix-blend-mode */
+.card-texture {
+  background-image: repeating-linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.05) 0px,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    repeating-linear-gradient(
+      65deg,
+      rgba(0, 0, 0, 0.12) 0px,
+      rgba(0, 0, 0, 0.12) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  mix-blend-mode: overlay;
+}
